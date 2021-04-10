@@ -63,17 +63,17 @@ local function onVehicleReset(player, vehID,  data)
 	if lastUpdateTimestamp[player.name] == nil or lastUpdateTimestamp[player.name] == 0 then
 		lastUpdateTimestamp[player.name] = os.clock()
 	else
-		CElog(player.name .." reset their vehicle, storing their updateTime", "timeTracker")
+		--CElog(player.name .." reset their vehicle, storing their updateTime", "timeTracker")
 		newUpdateTimestamp[player.name] = os.clock()
 		updateTime = newUpdateTimestamp[player.name] - lastUpdateTimestamp[player.name]
-		CElog(player.name .. "'s updateTime was: " .. updateTime, "timeTracker")
+		--CElog(player.name .. "'s updateTime was: " .. updateTime, "timeTracker")
 		totalTime = CobaltDB.query("playersDB/" .. player.name, "stats", "totalTime")
 		if totalTime == nil or totalTime == 0 then
-			CElog(player.name .. "'s new totalTime is: " .. totalTime, "timeTracker")
+			--CElog(player.name .. "'s new totalTime is: " .. totalTime, "timeTracker")
 			CobaltDB.set("playersDB/" .. player.name, "stats", "totalTime", updateTime)
 		else
 			totalTime = totalTime + updateTime
-			CElog(player.name .. "'s new totalTime is: " .. totalTime, "timeTracker")
+			--CElog(player.name .. "'s new totalTime is: " .. totalTime, "timeTracker")
 			CobaltDB.set("playersDB/" .. player.name, "stats", "totalTime", totalTime)
 		end
 		lastUpdateTimestamp[player.name] = newUpdateTimestamp[player.name]
