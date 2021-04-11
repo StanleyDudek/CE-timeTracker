@@ -75,7 +75,6 @@ local function onVehicleSpawn(player, vehID,  data)
 			CobaltDB.set("playersDB/" .. player.name, "stats", "totalTime", totalTime)
 		end
 		lastUpdateTimestamp[player.name] = newUpdateTimestamp[player.name]
-		
 	else
 		--CElog(player.name .." spawned a new vehicle, storing their updateTime", "timeTracker")
 		newUpdateTimestamp[player.name] = os.clock()
