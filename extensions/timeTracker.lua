@@ -51,10 +51,31 @@ local function onPlayerJoin(player)
 	lastUpdateTimestamp[player.name] = 0
 	totalTime = CobaltDB.query("playersDB/" .. player.name, "stats", "totalTime")
 	if totalTime == nil or totalTime == 0 then
-		CElog(player.name .. " has not been here before", "timeTracker")
+		CElog(player.name .. " has not been here before.", "timeTracker")
 		CobaltDB.set("playersDB/" .. player.name, "stats", "totalTime", 0)
 	else
 		CElog(player.name .. " has been here before, their totalTime is: " .. totalTime, "timeTracker")
+	end
+end
+
+local function onVehicleSpawn(player, vehID,  data)
+	if lastUpdateTimestamp[player.name] == nil or lastUpdateTimestamp[player.name] == 0 then
+		lastUpdateTimestamp[player.name] = os.clock()
+	else
+		--CElog(player.name .." spawned a new vehicle, storing their updateTime", "timeTracker")
+		newUpdateTimestamp[player.name] = os.clock()
+		updateTime = newUpdateTimestamp[player.name] - lastUpdateTimestamp[player.name]
+		--CElog(player.name .. "'s updateTime was: " .. updateTime, "timeTracker")
+		totalTime = CobaltDB.query("playersDB/" .. player.name, "stats", "totalTime")
+		if totalTime == nil or totalTime == 0 then
+			--CElog(player.name .. "'s new totalTime is: " .. totalTime, "timeTracker")
+			CobaltDB.set("playersDB/" .. player.name, "stats", "totalTime", updateTime)
+		else
+			totalTime = totalTime + updateTime
+			--CElog(player.name .. "'s new totalTime is: " .. totalTime, "timeTracker")
+			CobaltDB.set("playersDB/" .. player.name, "stats", "totalTime", totalTime)
+		end
+		lastUpdateTimestamp[player.name] = newUpdateTimestamp[player.name]
 	end
 end
 
@@ -85,21 +106,21 @@ local function onPlayerDisconnect(player)
 	if joinTimestamp[player.name] == nil then --they never synced
 		CElog(player.name .. " failed to sync", "timeTracker")
 	else
-		CElog(player.name .." is leaving, storing their sessionTime", "timeTracker")
 		leaveTimestamp[player.name] = os.clock()
-		sessionTime = leaveTimestamp[player.name] - lastUpdateTimestamp[player.name]
-		CElog(player.name .. "'s session time was: " .. sessionTime, "timeTracker")
+		updateTime = leaveTimestamp[player.name] - lastUpdateTimestamp[player.name]
 		totalTime = CobaltDB.query("playersDB/" .. player.name, "stats", "totalTime")
 		if totalTime == nil or totalTime == 0 then
-			CElog(player.name .. " has not been here before, their totalTime is: " .. sessionTime, "timeTracker")
-			CobaltDB.set("playersDB/" .. player.name, "stats", "totalTime", sessionTime)
+			totalTime = leaveTimestamp[player.name] - joinTimestamp[player.name]
+			CobaltDB.set("playersDB/" .. player.name, "stats", "totalTime", totalTime)
 		else
-			totalTime = totalTime + sessionTime
-			CElog(player.name .. " has been here before, their new totalTime is: " .. totalTime, "timeTracker")
+			totalTime = totalTime + updateTime
 			CobaltDB.set("playersDB/" .. player.name, "stats", "totalTime", totalTime)
 		end
+		CElog(player.name .. "'s totalTime is: " .. totalTime, "timeTracker")
 		lastUpdateTimestamp[player.name] = 0
 		newUpdateTimestamp[player.name] = 0
+		joinTimestamp[player.name] = 0
+		leaveTimestamp[player.name] = 0
 	end
 end
 
