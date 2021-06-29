@@ -1,3 +1,5 @@
+## 🛑 OUTDATED UNTIL FURTHER NOTICE 🛑 USE AT OWN DISCRETION 🛑
+
 # CE-timeTracker
 ## A CobaltEssentials extension to provide tracking of cumulative player connection time across sessions on BeamMP Servers
 
